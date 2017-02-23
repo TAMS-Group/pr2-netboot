@@ -233,9 +233,16 @@ def main(argv, stdout, environ):
    # Shutdown machine 2:
    ret = subprocess.call(SSH_CMD + ['c2', 'shutdown', '-P', 'now'] + reboot_opt)
 
+   # Try to shutdown head - this will fail graciously if there is no head
+   ret_head = subprocess.call(SSH_CMD + ['pr2-head', 'shutdown', '-P', 'now'] + reboot_opt)
+
    # Wait for machine 2 to go down:
    while subprocess.call(['ping', 'c2', '-c', '2']) == 0:
       time.sleep(1)
+
+   if ret_head == 0:
+      while subprocess.call(['ping', 'pr2-head', '-c', '2']) == 0:
+         time.sleep(1)
     
    # Wait a little longer for safety
    time.sleep(5)
